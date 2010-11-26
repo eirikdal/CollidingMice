@@ -4,6 +4,8 @@
 #include "fuzzyitem.h"
 #include <list>
 
+using namespace std;
+
 enum LINGTYPE
 {
     INPUT, OUTPUT, NOTSET,
@@ -21,14 +23,13 @@ struct LingVar
     list<FuzzySet> items;
 };
 
-
 template <class T>
 class FuzzyLing
 {
 public:
-    FuzzyLing(char* desc, LINGTYPE type);
+    FuzzyLing(LingVar, LINGTYPE);
 
-    void Add(FuzzyItem<T>*, char* szName);
+    // void Add(FuzzyItem<T>*, char* szName);
     FuzzyItem<T>* Fuzzify(T d);
 
     void setType(LINGTYPE type) { m_eType = type; }
@@ -37,42 +38,26 @@ public:
 
     ~FuzzyLing()
     {
-        while (start != NULL)
-        {
-            free(start->ths);
-            start = start->nxt;
-        }
     }
-
-
-    struct LingNode
-    {
-        FuzzyItem<T>* ths;
-        LingNode* nxt;
-    };
-
-    LingNode* List() { return start; }
 
 private:
     LINGTYPE m_eType;
-    char* m_szDescription;
-    LingNode* start;
+    char* m_szName;
+    LingVar m_pLing;
 
 public:
-    char* Name() { return m_szDescription; }
+    char* Name() { return m_szName; }
 };
 
 
 template <class T>
-FuzzyLing<T>::FuzzyLing(char* d, LINGTYPE type)
+FuzzyLing<T>::FuzzyLing(LingVar v, LINGTYPE type)
 {
-    start = new LingNode();
-    start->ths = NULL;
-    start->nxt = NULL;
     m_eType = type;
-    m_szDescription = d;
+    m_pLing = v;
 }
 
+/*
 template <class T>
 void FuzzyLing<T>::Add(FuzzyItem<T>* lv)
 {
@@ -93,12 +78,11 @@ void FuzzyLing<T>::Add(FuzzyItem<T>* lv)
         it->ths = *lv;
     }
 }
+*/
 
 template <class T>
 FuzzyItem<T>* FuzzyLing<T>::Fuzzify(T d)
 {
-    LingNode* cur = start;
-
     FuzzyItem<T>* found;
 
     /*
@@ -106,29 +90,31 @@ FuzzyItem<T>* FuzzyLing<T>::Fuzzify(T d)
      * find out which is closest of each of
      * the lingvars in the list
      */
-    while (cur->nxt != NULL)
+    for (list<FuzzySet>::iterator lv = m_pLing.items.begin(); lv != m_pLing.items.end(); lv++)
     {
         float temp = .0;
+        FuzzySet cur = *lv;
 
-        switch (cur->ths->Type())
+        switch (cur.set->Type())
         {
         case GRADE:
-            temp = ((FuzzyGrade<T>*) cur->ths)->Member(d);
+            temp = ((FuzzyGrade<T>*) cur.set)->Member(d);
             break;
         case REVERSE:
-            temp = ((FuzzyRev<T>*) cur->ths)->Member(d);
+            temp = ((FuzzyRev<T>*) cur.set)->Member(d);
             break;
         case TRIANGLE:
-            temp = ((FuzzyTri<T>*) cur->ths)->Member(d);
+            temp = ((FuzzyTri<T>*) cur.set)->Member(d);
             break;
         case TRAPEZOID:
-            temp = ((FuzzyTrap<T>*) cur->ths)->Member(d);
+            temp = ((FuzzyTrap<T>*) cur.set)->Member(d);
+            break;
+        case UNKNOWN:
+            throw;
             break;
         }
 
-        cur->ths->Update(temp);
-
-        cur = cur->nxt;
+        cur.set->Update(temp);
     }
 
     return found;

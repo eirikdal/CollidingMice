@@ -79,7 +79,7 @@ FuzzyItem<T>::FuzzyItem (char* desc, MTYPE eType, T n, ...)
     int min = va_arg(ap, int);
     int max = min;
 
-    m_iParams = new int[n];
+    this->m_iParams = new int[n];
 
     for (int i=1; i < n; i++)
     {
