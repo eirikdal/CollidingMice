@@ -13,6 +13,7 @@ class FuzzyItem
 {
 public:
     FuzzyItem<T>(char*, MTYPE, T, ...);
+    FuzzyItem<T>() {}
 
     ~FuzzyItem()
     {
@@ -73,22 +74,22 @@ public:
 template <class T>
 FuzzyItem<T>::FuzzyItem (char* desc, MTYPE eType, T n, ...)
 {
+    this->m_iParams = new int[n];
+
     va_list ap;
     va_start(ap, n);
 
-    int min = va_arg(ap, int);
+    int min = 0; //va_arg(ap, int);
     int max = min;
 
-    this->m_iParams = new int[n];
-
-    for (int i=1; i < n; i++)
+    for (int i=0; i < n; i++)
     {
         int v = va_arg(ap,int);
         m_iParams[i] = v;
 
         if (m_iParams[i] > max)
             max = m_iParams[i];
-        if (m_iParams[i] < min)
+        if (m_iParams[i] < min || i == 0)
             min = m_iParams[i];
     }
 
@@ -104,8 +105,8 @@ FuzzyItem<T>::FuzzyItem (char* desc, MTYPE eType, T n, ...)
 template <class T>
 float FuzzyGrade<T>::Member(T d)
 {
-    float f = -1.0;
-    T x0 = this->m_iParams[0], x1 = this->m_iParams[1];
+    float f = .0;
+    float x0 = this->m_iParams[0], x1 = this->m_iParams[1];
 
     if (d < x0)
         f = 0.0;
@@ -120,8 +121,8 @@ float FuzzyGrade<T>::Member(T d)
 template <class T>
 float FuzzyTrap<T>::Member(T d)
 {
-    float f = -1.0;
-    T x0 = this->m_iParams[0], x1 = this->m_iParams[1], x2 = this->m_iParams[2], x3 = this->m_iParams[3];
+    float f = .0;
+    float x0 = this->m_iParams[0], x1 = this->m_iParams[1], x2 = this->m_iParams[2], x3 = this->m_iParams[3];
 
     if (d <= x0)
         f = 0.0;
@@ -140,7 +141,7 @@ float FuzzyTrap<T>::Member(T d)
 template <class T>
 float FuzzyRev<T>::Member(T d)
 {
-    float f = -1.0;
+    float f = .0;
     T x0 = this->m_iParams[0], x1 = this->m_iParams[1];
 
     if (d < x0)
@@ -148,7 +149,7 @@ float FuzzyRev<T>::Member(T d)
     else if (d > x1)
         f = 0.0;
     else
-        f = d / (x0 + x1);
+        f = 1.0f - (d / ((float)x0 + (float)x1));
 
     return f;
 }
@@ -156,8 +157,8 @@ float FuzzyRev<T>::Member(T d)
 template <class T>
 float FuzzyTri<T>::Member(T d)
 {
-    float f = -1.0;
-    T x0 = this->m_iParams[0], x1 = this->m_iParams[1], x2 = this->m_iParams[2];
+    float f = .0;
+    float x0 = this->m_iParams[0], x1 = this->m_iParams[1], x2 = this->m_iParams[2];
 
     if (d <= x0)
         f = 0.0;

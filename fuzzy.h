@@ -15,12 +15,13 @@ public:
     enum RATING { VERYWEAK=1, WEAK, AVERAGE, STRONG, VERYSTRONG };
     enum RANGE { VERYSHORT, SHORT, MEDIUM, LONG, VERYLONG };
 
+    /*
     struct FuzzySet
     {
         FuzzyLing<int>::FuzzyLing* ths;
         FuzzySet* nxt;
     };
-
+*/
     ACTION action(int, int, int);
 
 private:

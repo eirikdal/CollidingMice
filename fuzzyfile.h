@@ -13,7 +13,7 @@ using namespace std;
 
 struct FuzzyData
 {
-    list< FuzzyLing<int>* > lingVars;
+    list< LingVar > lingVars;
     FuzzyRule* rules;
 };
 
@@ -39,7 +39,7 @@ private:
 
 public:
     FuzzyData* getData() { return m_pFuzzyData; }
-    list< FuzzyLing<int>* > getLings() { return m_pFuzzyData->lingVars; }
+    list< LingVar > getLings() { return m_pFuzzyData->lingVars; }
     FuzzyRule* getRules() { return m_pFuzzyData->rules; }
 };
 

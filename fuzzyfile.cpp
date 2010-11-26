@@ -103,8 +103,6 @@ void FuzzyFile::c_fuzzy(char* tok, list<LingVar> lingVars)
                         x02 = atoi(x3);
 
                         memcpy(s.set, new FuzzyTri<int>(name, x00, x01, x02), sizeof(FuzzyTri<int>));
-                        //s.set = new FuzzyTri<int>(name, x00, x01, x02);
-                        *it = s;
                         break;
                     }
                     else if (strcmp(tok, "grade") == 0)
@@ -129,16 +127,15 @@ void FuzzyFile::c_fuzzy(char* tok, list<LingVar> lingVars)
                         x01 = atoi(x2);
 
                         memcpy(s.set, new FuzzyGrade<int>(name,x00,x01), sizeof(FuzzyGrade<int>));
-                        //s.set = new FuzzyGrade<int>(name,x00,x01);
-                        *it = s;
                         break;
                     }
                     else if (strcmp(tok, "trapezoid") == 0)
                     {
-                        char *c0, *c1, *c2;
+                        char *c0, *c1, *c2, *c3;
                         c0 = strtok(func, "|");
                         c1 = strtok(NULL, "|");
                         c2 = strtok(NULL, "|");
+                        c3 = strtok(NULL, "|");
 
                         char *x1, *x2, *x3, *x4;
                         char *y1, *y2, *y3, *y4;
@@ -152,7 +149,7 @@ void FuzzyFile::c_fuzzy(char* tok, list<LingVar> lingVars)
                         x3 = strtok(c2, ",");
                         y3 = strtok(NULL, ",");
 
-                        x4 = strtok(c2, ",");
+                        x4 = strtok(c3, ",");
                         y4 = strtok(NULL, ",");
 
                         int x00, x01, x02, x03;
@@ -162,9 +159,7 @@ void FuzzyFile::c_fuzzy(char* tok, list<LingVar> lingVars)
                         x02 = atoi(x3);
                         x03 = atoi(x4);
 
-                        //s.set =  new FuzzyTrap<int>(name,x00, x01, x02, x03);
                         memcpy(s.set, new FuzzyTrap<int>(name,x00, x01, x02, x03), sizeof(FuzzyTrap<int>));
-                        *it = s;
                         break;
                     }
                     else if (strcmp(tok, "reverse") == 0)
@@ -188,14 +183,11 @@ void FuzzyFile::c_fuzzy(char* tok, list<LingVar> lingVars)
                         x00 = atoi(x1);
                         x01 = atoi(x2);
 
-                        //s.set = new FuzzyRev<int>(name,x00,x01);
                         memcpy(s.set, new FuzzyRev<int>(name,x00,x01), sizeof(FuzzyRev<int>));
-                        *it = s;
                         break;
                     }
                 }
             }
-            *it = s;
         }
 
         *lv = v;
@@ -225,13 +217,6 @@ void FuzzyFile::c_if(char* tok, list<LingVar> lingVars, FuzzyRule* rules)
     }
 
     strcpy(ant, tok);
-    // LingVar* v = this->FindLV(pre, lingVars);
-
-    /* add to the rule base */
-    // FuzzySet* fs = this->FindMF(ant, v->items);
-    // FuzzyLing<int>* lv = new FuzzyLing<int>(v, INPUT);
-    // FuzzyItem<int>* f = fs->set;
-    // m_pFuzzyLings.push_back(lv);
 
     RuleNode* ruleNode = new RuleNode();
     ruleNode->ant = ant;
@@ -258,17 +243,9 @@ void FuzzyFile::c_if(char* tok, list<LingVar> lingVars, FuzzyRule* rules)
             tok = strtok(NULL, " ");
 
             pre = new char[48];
-            //ant = new char[48];
 
             strcpy(pre, tok);
             tok = strtok(NULL, " ");
-            //tok = strtok(NULL, " ");
-            //strcpy(ant, tok);
-
-            // LingVar* v = this->FindLV(pre, lingVars);
-            //FuzzyLing<int>* lv = new FuzzyLing<int>(v->name, OUTPUT);
-            //m_pFuzzyLings.push_back(lv);
-            //FuzzySet* fs = this->FindMF(ant, v->items);
 
             rules->Add(ruleList, pre);
 
@@ -292,18 +269,10 @@ void FuzzyFile::c_if(char* tok, list<LingVar> lingVars, FuzzyRule* rules)
                 tok = strtok(NULL, " ");
             }
 
-            //pre = new char[48];
             ant = new char[48];
 
             strcpy(ant, tok);
             tok = strtok(NULL, " ");
-            //strcpy(ant, tok);
-
-
-            // LingVar* v = this->FindLV(pre, lingVars);
-            // FuzzyLing<int>* lv = new FuzzyLing<int>(v->name, INPUT);
-            // m_pFuzzyLings.push_back(lv);
-            //FuzzyItem<int>* fs = (this->FindMF(ant, v->items))->set;
 
             RuleNode* ruleNode = new RuleNode();
             ruleNode->ant = ant;
@@ -358,6 +327,7 @@ bool FuzzyFile::Load()
                     {
                         FuzzySet set;
                         set.name = new char[64];
+                        set.set = new FuzzyItem<int>();
                         strcpy(set.name, tok);
 
                         items.push_back(set);
@@ -386,7 +356,7 @@ bool FuzzyFile::Load()
             }
         }
         m_pFuzzyData = new FuzzyData();
-        m_pFuzzyData->lingVars = m_pFuzzyLings;
+        m_pFuzzyData->lingVars = lingVars;
         m_pFuzzyData->rules = rules;
     }
     else

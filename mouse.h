@@ -58,6 +58,7 @@ public:
     // BEGIN IT3105
     void setHealth(int h);
     int getHealth(void);
+    int getRating() { return m_iRating; }
     // END IT3105
 
 protected:
@@ -72,6 +73,7 @@ private:
     // BEGIN IT3105
     QLineF minDist;
     int m_iHealth;
+    int m_iRating;
     Fuzzy* fuzzy;
     // END IT3105
 

@@ -82,6 +82,8 @@ Mouse::Mouse()
     fuzzy = new Fuzzy::Fuzzy();
 
     m_iHealth = 100;
+    m_iRating = rand() % 100;
+
     /*
     FuzzyLing<int>* lingspeed = new FuzzyLing<int>((char*)"SPEED", INPUT);
     FuzzyLing<int>* linghealth = new FuzzyLing<int>((char*)"HEALTH", INPUT);
@@ -210,19 +212,21 @@ void Mouse::advance(int step)
                                                        << mapToScene(-30, -50)
                                                        << mapToScene(30, -50));
 
-    QLineF minDistMouse(QPointF(0, 0), mapFromItem(dangerMice[0], 0, 0));
+    int min = 1000000;
+
+    Mouse* nearestMouse;
 
     foreach (QGraphicsItem *item, dangerMice) {
         if (item == this)
             continue;
 
         QLineF lineToMouse(QPointF(0, 0), mapFromItem(item, 0, 0));
+        int len = lineToMouse.length();
 
-        if (::abs(lineToMouse.length()) < ::abs(minDistMouse.length()) &&
-            lineToMouse != minDistMouse)
+        if (len < min)
         {
-            minDistMouse = lineToMouse;
-            minDist = minDistMouse;
+            nearestMouse = (Mouse*)item;
+            min = len;
         }
 
         qreal angleToMouse = ::acos(lineToMouse.dx() / lineToMouse.length());
@@ -247,34 +251,36 @@ void Mouse::advance(int step)
 
 
 //! [10]
-    switch (fuzzy->action(this->getHealth(), rand()%100, minDistMouse.length()))
+    if (dangerMice.size() > 1)
     {
-    case Fuzzy::ATTACK:
-        break;
-    case Fuzzy::FLEE:
-        break;
-    case Fuzzy::RUN:
-        break;
-    case Fuzzy::NONE:
-        // Add some random movement
-        if (dangerMice.size() > 1 && (qrand() % 10) == 0) {
-            if (qrand() % 1)
-                angle += (qrand() % 100) / 500.0;
-            else
-                angle -= (qrand() % 100) / 500.0;
-
-            }
-        speed += (-50 + qrand() % 100) / 100.0;
-
-        qreal dx = ::sin(angle) * 10;
-        mouseEyeDirection = (qAbs(dx / 5) < 1) ? 0 : dx / 5;
-
-        setRotation(rotation() + dx);
-        setPos(mapToParent(0, -(3 + sin(speed) * 3)));
-        break;
-
+        switch (fuzzy->action(this->getHealth(), nearestMouse->getRating(), min))
+        {
+        case Fuzzy::ATTACK:
+            break;
+        case Fuzzy::FLEE:
+            break;
+        case Fuzzy::RUN:
+            break;
+        case Fuzzy::NONE:
+            // Add some random movement
+            break;
+        }
     }
 
+    if (dangerMice.size() > 1 && (qrand() % 10) == 0) {
+        if (qrand() % 1)
+            angle += (qrand() % 100) / 500.0;
+        else
+            angle -= (qrand() % 100) / 500.0;
+
+        }
+    speed += (-50 + qrand() % 100) / 100.0;
+
+    qreal dx = ::sin(angle) * 10;
+    mouseEyeDirection = (qAbs(dx / 5) < 1) ? 0 : dx / 5;
+
+    setRotation(rotation() + dx);
+    setPos(mapToParent(0, -(3 + sin(speed) * 3)));
 //! [11]
 
 }

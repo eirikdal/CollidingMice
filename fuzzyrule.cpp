@@ -1,70 +1,76 @@
 #include "fuzzyrule.h"
+#include <list>
 
 FuzzyRule::FuzzyRule()
 {
     //root = NULL;
 }
 
-bool FuzzyRule::Eval(FuzzyLing<int>* ling)
+bool FuzzyRule::Eval(list<FuzzySet*> ling)
 {
     bool b = false;
+    bool bAnd = false;
+    bool bOr = false;
 
-    /*
-    RuleNode* rules = root;
-
-
-    FuzzyLing<int>::LingNode* l = ling->List();
-
-    while (l->nxt != NULL)
+    for (list<Rule*>::iterator pr = m_pRules.begin(); pr != m_pRules.end(); pr++)
     {
-        if (b) return b;
+        Rule* r = *pr;
 
-        b = true;
-
-        while (rules->nxt != NULL)
+        for (list<RuleNode*>::iterator pn = r->rules->begin(); pn != r->rules->end(); pn++)
         {
-            if (ling->getType() == INPUT)
-            {
-                /* If this lingvar is an input variable, we need to check
-                   it against the rules */
+            RuleNode* n = *pn;
 
-          /*  }
-            else
+            for (list<FuzzySet*>::iterator ps = ling.begin(); ps != ling.end(); ps++)
             {
-                if (l->ths == NULL)
+                FuzzySet* s = *ps;
+
+                if (strcmp(n->pre, s->type) != 0)
+                    continue;
+
+                if (n->conn == AND)
                 {
-                    /* If this lingvar is an output variable,
-                       we need to return them */
-                    // out->ths = l;
-              /*  }
+                    bAnd = true;
+                    bOr = false;
+                }
+                else if (n->conn == OR)
+                {
+                    bOr = true;
+                    bAnd = false;
+                }
+                else
+                {
+                    bOr = false;
+                    bAnd = false;
+                }
+
+                if (strcmp(s->name, n->ant) == 0 && n->sign == POS)
+                {
+                    if (!b && bAnd)
+                        b = false;
+                    else
+                        b = true;
+                }
+                else if (strcmp(s->name, n->ant) != 0 && n->sign == NEG)
+                {
+                    if (!b && bAnd)
+                        b = false;
+                    else
+                        b = true;
+                }
+                else if (bOr && b)
+                    b = true;
+                else
+                    b = false;
             }
         }
+        if (b)
+        {
+            b = false;
+        }
     }
-    */
+
     return b;
 }
-
-/* Add another rule, with input, output and possibly connector */
-/*void FuzzyRule::Add(char* pre, char* ant, PREFIX sign, RULECONN conn)
-{
-    RuleNode* k = new RuleNode();
-    k->pre = pre;
-    k->ant = ant;
-    k->conn = conn;
-    k->sign = sign;
-
-    if (root == NULL)
-        root = k;
-    else
-    {
-        RuleNode* start = root;
-
-        while (start->nxt != NULL)
-            start = start->nxt;
-
-        start->nxt = k;
-    }
-}*/
 
 void FuzzyRule::Add(list<RuleNode*>* rules, char* cons)
 {

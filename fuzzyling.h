@@ -14,6 +14,8 @@ enum LINGTYPE
 struct FuzzySet
 {
     char* name;
+    char* type;
+    float f;
     FuzzyItem<int>* set;
 };
 
@@ -30,7 +32,7 @@ public:
     FuzzyLing(LingVar, LINGTYPE);
 
     // void Add(FuzzyItem<T>*, char* szName);
-    FuzzyItem<T>* Fuzzify(T d);
+    FuzzySet* Fuzzify(T d);
 
     void setType(LINGTYPE type) { m_eType = type; }
 
@@ -43,7 +45,7 @@ public:
 private:
     LINGTYPE m_eType;
     char* m_szName;
-    LingVar m_pLing;
+    list< FuzzySet > m_pLing;
 
 public:
     char* Name() { return m_szName; }
@@ -54,7 +56,8 @@ template <class T>
 FuzzyLing<T>::FuzzyLing(LingVar v, LINGTYPE type)
 {
     m_eType = type;
-    m_pLing = v;
+    m_pLing = v.items;
+    m_szName = v.name;
 }
 
 /*
@@ -81,18 +84,20 @@ void FuzzyLing<T>::Add(FuzzyItem<T>* lv)
 */
 
 template <class T>
-FuzzyItem<T>* FuzzyLing<T>::Fuzzify(T d)
+FuzzySet* FuzzyLing<T>::Fuzzify(T d)
 {
-    FuzzyItem<T>* found;
+    FuzzySet* found = new FuzzySet();
 
     /*
      * For each of the membership functions,
      * find out which is closest of each of
      * the lingvars in the list
      */
-    for (list<FuzzySet>::iterator lv = m_pLing.items.begin(); lv != m_pLing.items.end(); lv++)
+    float max = .0;
+    float temp = .0;
+
+    for (list<FuzzySet>::iterator lv = m_pLing.begin(); lv != m_pLing.end(); lv++)
     {
-        float temp = .0;
         FuzzySet cur = *lv;
 
         switch (cur.set->Type())
@@ -114,6 +119,15 @@ FuzzyItem<T>* FuzzyLing<T>::Fuzzify(T d)
             break;
         }
 
+        if (temp >= max)
+        {
+            max = temp;
+            memcpy(found, &(*lv), sizeof(FuzzySet));
+            found->f = max;
+            //found = &cur;
+        }
+
+        /* update the grade of membership */
         cur.set->Update(temp);
     }
 

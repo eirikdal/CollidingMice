@@ -31,7 +31,7 @@ public:
     FuzzyRule();
 
     void Add(list<RuleNode*>*, char*);
-    bool Eval(FuzzyLing<int>::FuzzyLing*);
+    bool Eval(list<FuzzySet*>);
 
 private:
     list<Rule*> m_pRules;
