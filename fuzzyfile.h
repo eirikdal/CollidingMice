@@ -33,6 +33,7 @@ private:
 
     void c_if(char*, list<LingVar>, FuzzyRule*);
     void c_fuzzy(char*, list<LingVar>);
+    HEDGE c_hedge(char*);
 
 public:
     FuzzyData* getData() { return m_pFuzzyData; }

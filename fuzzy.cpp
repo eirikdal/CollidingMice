@@ -99,6 +99,9 @@ int Fuzzy::action(int health, int rating, int range)
 {
     list<FuzzySet*> vars;
 
+    if (health != 100)
+        health = health + 0;
+
     for (list< FuzzyLing<int>* >::iterator lv = m_pLings.begin(); lv != m_pLings.end(); lv++)
     {
         FuzzyLing<int>* v = *lv;
@@ -185,10 +188,11 @@ int Fuzzy::action(int health, int rating, int range)
     if (cog2 != 0)
         cog = cog1 / cog2;
 
-    int speed = (-10 * m_fVal[7] + m_fVal[15] + m_fVal[22] * 10) / (m_fVal[7] + m_fVal[15] + m_fVal[22]);
+    // sugeno weighted average
+    int sugeno = (-10 * m_fVal[7] + m_fVal[15] + m_fVal[22] * 10) / (m_fVal[7] + m_fVal[15] + m_fVal[22]);
 
-    if (speed != 10)
-        return speed;
+    if (health != 100)
+        return sugeno;
 
-    return speed;
+    return sugeno;
 }

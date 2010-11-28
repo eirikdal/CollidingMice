@@ -4,8 +4,10 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 enum MTYPE { GRADE, TRAPEZOID, REVERSE, TRIANGLE, UNKNOWN };
+enum HEDGE { SLIGHTLY, LITTLE, VERY, EXTREMELY, NORMAL };
 
 /* Linguistic variable */
 template <class T>
@@ -21,17 +23,24 @@ public:
     }
 
     MTYPE Type() { return m_eType; }
-    void Update(float f) { m_fGrade = f; }
+
+    /* update degree of membership and hedges */
+    void Update(float f) {
+        m_fGrade = f;
+    }
 
     int Max() { return m_iMax; }
     int Min() { return m_iMin; }
 protected:
-    float Grade() { return m_fGrade; }  
+    float Grade(HEDGE hedge) {
+        return m_fGrade;
+    }
     int* m_iParams;
 
 private:
     int m_iMax;
     int m_iMin;
+
     float m_fGrade;
     MTYPE m_eType;
     char m_szDescription[64];
@@ -43,7 +52,6 @@ class FuzzyTrap : public FuzzyItem<T>
 public:
     FuzzyTrap(char* d, T x0, T x1, T x2, T x3) : FuzzyItem<T>(d, TRAPEZOID, 4, x0, x1, x2, x3) {}
     float Member (T);
-    T fromMember(float, int);
 };
 
 template <class T>
@@ -52,7 +60,6 @@ class FuzzyGrade : public FuzzyItem<T>
 public:
     FuzzyGrade(char* d, T x0, T x1) : FuzzyItem<T>(d, GRADE, 2, x0,x1) {}
     float Member(T);
-    T fromMember(float, int);
 };
 
 template <class T>
@@ -61,7 +68,6 @@ class FuzzyTri : public FuzzyItem<T>
 public:
     FuzzyTri(char* d, T x0, T x1, T x2) : FuzzyItem<T>(d, TRIANGLE, 3, x0, x1, x2) {}
     float Member(T);
-    T fromMember(float, int);
 };
 
 template <class T>
@@ -70,7 +76,6 @@ class FuzzyRev : public FuzzyItem<T>
 public:
     FuzzyRev(char* d, T x0, T x1) : FuzzyItem<T>(d, REVERSE, 2, x0, x1) {}
     float Member(T);
-    T fromMember(float, int);
 };
 
 
@@ -121,82 +126,10 @@ float FuzzyGrade<T>::Member(T d)
     else
         f = d / (x0 + x1);
 
+    this->Update(f);
+
     return f;
 }
-
-template <class T>
-T FuzzyGrade<T>::fromMember(float f, int i)
-{
-    T d = this->Min();
-    float x0 = this->m_iParams[0], x1 = this->m_iParams[1];
-
-    if (d < x0)
-        d = this->Min();
-    else if (d > x1)
-        d = this->Max();
-    else
-        d = f * (x0 + x1);
-
-    return d;
-}
-
-template <class T>
-T FuzzyTri<T>::fromMember(float f, int i)
-{
-    T d = this->Min();
-    float x0 = this->m_iParams[0], x1 = this->m_iParams[1], x2 = this->m_iParams[2];
-
-    if (d <= x0)
-        d = this->Min();
-    else if (d > x0 && d <= x1)
-        d = f * (x0 + x1);
-    else if (d > x1 && d <= x2)
-        d = f * (x1 + x2);
-    else
-        d = this->Max();
-
-    return d;
-}
-
-
-template <class T>
-T FuzzyRev<T>::fromMember(float f, int i)
-{
-    T d = this->Min();
-    T x0 = this->m_iParams[0], x1 = this->m_iParams[1];
-
-    if (d < x0)
-        d = this->Max();
-    else if (d > x1)
-        d = this->Min();
-    else
-        d = (1.0f - f) * (x0 + x1);
-
-    return d;
-}
-
-
-template <class T>
-T FuzzyTrap<T>::fromMember(float f, int i)
-{
-    T d;
-
-    float x0 = this->m_iParams[0], x1 = this->m_iParams[1], x2 = this->m_iParams[2], x3 = this->m_iParams[3];
-
-    if (d <= x0)
-        d = this->Min();
-    else if (d > x0 && d <= x1)
-        d = f * (x0 + x1);
-    else if (d > x1 && d <= x2)
-        d = this->Max();
-    else if (d > x2 && d <= x3)
-        d  =  f * (x2 + x3);
-    else
-        d = this->Min();
-
-    return d;
-}
-
 
 template <class T>
 float FuzzyTrap<T>::Member(T d)
@@ -217,6 +150,8 @@ float FuzzyTrap<T>::Member(T d)
     else
         f = 0.0;
 
+    this->Update(f);
+
     return f;
 }
 
@@ -234,6 +169,8 @@ float FuzzyRev<T>::Member(T d)
         f = 0.0;
     else
         f = 1.0f - (d / ((float)x0 + (float)x1));
+
+    this->Update(f);
 
     return f;
 }
@@ -254,6 +191,8 @@ float FuzzyTri<T>::Member(T d)
         f = d / (x1 + x2);
     else
         f = 0.0;
+
+    this->Update(f);
 
     return f;
 }

@@ -6,6 +6,27 @@ FuzzyRule::FuzzyRule()
     //root = NULL;
 }
 
+float FuzzyRule::Hedgify(float f, HEDGE h)
+{
+    switch (h)
+    {
+    case SLIGHTLY:
+        f = ::pow(f, 1.7);
+        break;
+    case LITTLE:
+        f = ::pow(f, 1.3);
+        break;
+    case VERY:
+        f = ::pow(f, 2.0);
+        break;
+    case EXTREMELY:
+        f = ::pow(f, 3.0);
+        break;
+    }
+
+    return f;
+}
+
 list<FuzzySet*> FuzzyRule::Eval(list<FuzzySet*> ling)
 {
     /* temp variables for control flow */
@@ -14,7 +35,7 @@ list<FuzzySet*> FuzzyRule::Eval(list<FuzzySet*> ling)
     bool bOr = false;
 
     /* temp variables for clipping/scaling */
-    float fVal = 0;
+    float fVal = .0;
 
     list<FuzzySet*>* c_list = new list<FuzzySet*>();
     list<Rule*> r_list = m_pRules;
@@ -58,12 +79,12 @@ list<FuzzySet*> FuzzyRule::Eval(list<FuzzySet*> ling)
                         b = false;
                     else if(b && bAnd)
                     {
-                        fVal = min(fVal, s->f);
+                        fVal = min(fVal, this->Hedgify(s->f, n->hedge));
                         b = true;
                     }
                     else
                     {
-                        fVal = s->f;
+                        fVal = this->Hedgify(s->f, n->hedge);
                         b = true;
                     }
                 }
@@ -73,18 +94,18 @@ list<FuzzySet*> FuzzyRule::Eval(list<FuzzySet*> ling)
                         b = false;
                     else if(b && bAnd)
                     {
-                        fVal = min(fVal, s->f);
+                        fVal = min(fVal, this->Hedgify(s->f, n->hedge));
                         b = true;
                     }
                     else
                     {
-                        fVal = s->f;
+                        fVal = this->Hedgify(s->f, n->hedge);
                         b = true;
                     }
                 }
                 else if (bOr && b)
                 {
-                    fVal = max(fVal, s->f);
+                    fVal = max(fVal, this->Hedgify(s->f, n->hedge));
                     b = true;
                 }
                 else

@@ -257,7 +257,7 @@ void Mouse::advance(int step)
     {
         Mouse* otherMouse = (Mouse*) item;
 
-        otherMouse->setHealth(otherMouse->getHealth() - (qrand()%5));
+        otherMouse->setHealth(-(qrand()%5));
 
         if (otherMouse->getHealth() <= 0)
             otherMouse->removeFromIndex();

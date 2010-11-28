@@ -75,29 +75,6 @@ FuzzyLing<T>::FuzzyLing(LingVar v, LINGTYPE type)
     m_szName = v.name;
 }
 
-/*
-template <class T>
-void FuzzyLing<T>::Add(FuzzyItem<T>* lv)
-{
-    if (this->start == NULL)
-    {
-        start = new LingNode();
-        //memcpy( &start->ths, lv, sizeof( FuzzyItem<int> ) );
-        start->ths = *lv;
-    }
-    else
-    {
-        LingNode* it = start;
-
-        while (it->nxt != NULL)
-            it = it->nxt;
-
-        // memcpy( &it->ths, lv, sizeof( FuzzyItem<int> ) );
-        it->ths = *lv;
-    }
-}
-*/
-
 template <class T>
 FuzzySet* FuzzyLing<T>::Fuzzify(T d)
 {

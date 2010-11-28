@@ -161,6 +161,24 @@ void FuzzyFile::c_fuzzy(char* tok, list<LingVar> lingVars)
     }
 }
 
+HEDGE FuzzyFile::c_hedge(char* tok)
+{
+    HEDGE hedge;
+
+    if (strcmp(tok, "slightly") == 0)
+        hedge = SLIGHTLY;
+    else if (strcmp(tok, "little") == 0)
+        hedge = LITTLE;
+    else if (strcmp(tok, "very") == 0)
+        hedge = VERY;
+    else if (strcmp(tok, "extremely") == 0)
+        hedge = EXTREMELY;
+    else
+        hedge = NORMAL;
+
+    return hedge;
+}
+
 void FuzzyFile::c_if(char* tok, list<LingVar> lingVars, FuzzyRule* rules)
 {
     list<RuleNode*>* ruleList = new list<RuleNode*>();
@@ -171,6 +189,7 @@ void FuzzyFile::c_if(char* tok, list<LingVar> lingVars, FuzzyRule* rules)
 
     PREFIX sign = POS;
     RULECONN conn = NONE;
+    HEDGE hedge = NORMAL;
 
     tok = strtok(NULL, " "); // if
     strcpy(pre, tok);
@@ -183,6 +202,11 @@ void FuzzyFile::c_if(char* tok, list<LingVar> lingVars, FuzzyRule* rules)
         tok = strtok(NULL, " ");
     }
 
+    hedge = c_hedge(tok);
+
+    if (hedge != NORMAL)
+        strtok(NULL, " ");
+
     strcpy(ant, tok);
 
     RuleNode* ruleNode = new RuleNode();
@@ -190,6 +214,7 @@ void FuzzyFile::c_if(char* tok, list<LingVar> lingVars, FuzzyRule* rules)
     ruleNode->conn = conn;
     ruleNode->pre = pre;
     ruleNode->sign = sign;
+    ruleNode->hedge = hedge;
 
     ruleList->push_back(ruleNode);
 
@@ -236,6 +261,11 @@ void FuzzyFile::c_if(char* tok, list<LingVar> lingVars, FuzzyRule* rules)
                 tok = strtok(NULL, " ");
             }
 
+            hedge = c_hedge(tok);
+
+            if (hedge != NORMAL)
+                strtok(NULL, " ");
+
             ant = new char[48];
 
             strcpy(ant, tok);
@@ -246,6 +276,7 @@ void FuzzyFile::c_if(char* tok, list<LingVar> lingVars, FuzzyRule* rules)
             ruleNode->conn = conn;
             ruleNode->pre = pre;
             ruleNode->sign = sign;
+            ruleNode->hedge = hedge;
 
             ruleList->push_back(ruleNode);
         }

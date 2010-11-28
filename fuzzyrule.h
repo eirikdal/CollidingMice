@@ -13,6 +13,8 @@ struct RuleNode
 {
     char* pre;
     char* ant;
+
+    HEDGE hedge;
     PREFIX sign;
     RULECONN conn;
 };
@@ -35,6 +37,7 @@ public:
 
 private:
     list<Rule*> m_pRules;
+    float Hedgify(float, HEDGE);
 };
 
 #endif // FUZZYRULE_H

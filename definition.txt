@@ -3,11 +3,11 @@ define lingvar rating wimp moderate hard
 define lingvar action donothing attack flee
 define lingvar range close medium far distant
 
-define fuzzyset uninjured grade=95,1|100,0
-define fuzzyset minor triangle=80,0|90,1|100,0
-define fuzzyset serious triangle=50,0|75,1|100,0
-define fuzzyset critical trapezoid=10,0|25,1|35,1|50,0
-define fuzzyset neardeath reverse=0,0|10,1
+define fuzzyset neardeath reverse=0,1|20,0
+define fuzzyset critical trapezoid=0,0|15,1|30,1|45,0
+define fuzzyset serious triangle=40,0|50,1|60,0
+define fuzzyset minor trapezoid=50,0|65,1|80,1|95,0
+define fuzzyset uninjured grade=90,1|100,0
 
 define fuzzyset close reverse=0,1|25,0
 define fuzzyset medium triangle=20,0|50,1|75,0
@@ -31,3 +31,4 @@ if rating is moderate AND health is uninjured then action is attack
 if rating is wimp then action is attack
 if rating is not hard AND health is uninjured then action is attack
 if rating is not hard AND health is not uninjured then action is donothing
+if rating is very wimp then action is attack
