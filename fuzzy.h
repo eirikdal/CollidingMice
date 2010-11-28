@@ -10,11 +10,6 @@ public:
     Fuzzy ();
     ~Fuzzy();
 
-    enum ACTION { FLEE, RUN, ATTACK, NONE };
-    enum HEALTH { VERYLOW=1, LOW=3, MED=5, HIGH=7, VERYHIGH=9};
-    enum RATING { VERYWEAK=1, WEAK, AVERAGE, STRONG, VERYSTRONG };
-    enum RANGE { VERYSHORT, SHORT, MEDIUM, LONG, VERYLONG };
-
     /*
     struct FuzzySet
     {
@@ -22,7 +17,11 @@ public:
         FuzzySet* nxt;
     };
 */
-    ACTION action(int, int, int);
+    int action(int, int, int);
+
+    static LingVar* FindLV(char*, list<LingVar>);
+    static FuzzySet* FindMF(char*, list<FuzzySet>);
+    static FuzzySet* FindMF(char*, list<LingVar>);
 
 private:
     FuzzySet* root;

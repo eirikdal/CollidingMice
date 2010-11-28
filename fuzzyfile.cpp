@@ -2,6 +2,7 @@
 #include "fuzzyling.h"
 #include "fuzzyitem.h"
 #include "fuzzyrule.h"
+#include "fuzzy.h"
 #include <string.h>
 
 #define SDATA "F:\\Dokumenter\\NTNU\\IT3105\\CollidingMice\\definition.txt"
@@ -18,40 +19,6 @@ FuzzyFile::~FuzzyFile()
 {
     m_pRead.close();
     //m_pWrite.close();
-}
-
-LingVar* FuzzyFile::FindLV(char* name, list<LingVar> lingVars)
-{
-    for (list<LingVar>::iterator lv = lingVars.begin(); lv != lingVars.end(); lv++)
-    {
-        LingVar v = *lv;
-
-        LingVar* ling = new LingVar();
-        ling->items = v.items;
-        ling->name = v.name;
-
-        if (strcmp(name, v.name) == 0)
-            return ling;
-    }
-
-    return NULL;
-}
-
-FuzzySet* FuzzyFile::FindMF(char* name, list<FuzzySet> items)
-{
-    for (list<FuzzySet>::iterator it = items.begin(); it != items.end(); it++)
-    {
-        FuzzySet fs = *it;
-
-        FuzzySet* set = new FuzzySet();
-        set->set = fs.set;
-        set->name = fs.name;
-
-        if (strcmp(name, fs.name) == 0)
-            return set;
-    }
-
-    return NULL;
 }
 
 void FuzzyFile::c_fuzzy(char* tok, list<LingVar> lingVars)
@@ -247,7 +214,7 @@ void FuzzyFile::c_if(char* tok, list<LingVar> lingVars, FuzzyRule* rules)
             strcpy(pre, tok);
             tok = strtok(NULL, " ");
 
-            rules->Add(ruleList, pre);
+            rules->Add(ruleList, Fuzzy::FindMF(pre, lingVars));
 
             break;
         }

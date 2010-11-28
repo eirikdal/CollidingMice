@@ -22,7 +22,7 @@ struct Rule
     // list of all arguments on left side
     list<RuleNode*>* rules;
     // consequent of rule
-    char* cons;
+    FuzzySet* cons;
 };
 
 class FuzzyRule
@@ -30,8 +30,8 @@ class FuzzyRule
 public:
     FuzzyRule();
 
-    void Add(list<RuleNode*>*, char*);
-    bool Eval(list<FuzzySet*>);
+    void Add(list<RuleNode*>*, FuzzySet*);
+    list<FuzzySet*> Eval(list<FuzzySet*>);
 
 private:
     list<Rule*> m_pRules;

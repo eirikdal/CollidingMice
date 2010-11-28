@@ -6,13 +6,22 @@ FuzzyRule::FuzzyRule()
     //root = NULL;
 }
 
-bool FuzzyRule::Eval(list<FuzzySet*> ling)
+list<FuzzySet*> FuzzyRule::Eval(list<FuzzySet*> ling)
 {
+    /* temp variables for control flow */
     bool b = false;
     bool bAnd = false;
     bool bOr = false;
 
-    for (list<Rule*>::iterator pr = m_pRules.begin(); pr != m_pRules.end(); pr++)
+    /* temp variables for clipping/scaling */
+    float fVal = 0;
+
+    list<FuzzySet*>* c_list = new list<FuzzySet*>();
+    list<Rule*> r_list = m_pRules;
+
+    /* TODO: we need to do AND(min), OR(max) "analysis here too" */
+
+    for (list<Rule*>::iterator pr = r_list.begin(); pr != r_list.end(); pr++)
     {
         Rule* r = *pr;
 
@@ -47,18 +56,37 @@ bool FuzzyRule::Eval(list<FuzzySet*> ling)
                 {
                     if (!b && bAnd)
                         b = false;
-                    else
+                    else if(b && bAnd)
+                    {
+                        fVal = min(fVal, s->f);
                         b = true;
+                    }
+                    else
+                    {
+                        fVal = s->f;
+                        b = true;
+                    }
                 }
                 else if (strcmp(s->name, n->ant) != 0 && n->sign == NEG)
                 {
                     if (!b && bAnd)
                         b = false;
-                    else
+                    else if(b && bAnd)
+                    {
+                        fVal = min(fVal, s->f);
                         b = true;
+                    }
+                    else
+                    {
+                        fVal = s->f;
+                        b = true;
+                    }
                 }
                 else if (bOr && b)
+                {
+                    fVal = max(fVal, s->f);
                     b = true;
+                }
                 else
                     b = false;
             }
@@ -66,13 +94,17 @@ bool FuzzyRule::Eval(list<FuzzySet*> ling)
         if (b)
         {
             b = false;
+            r->cons->f = fVal;
+            c_list->push_back(r->cons);
         }
+
+        fVal = .0;
     }
 
-    return b;
+    return *c_list;
 }
 
-void FuzzyRule::Add(list<RuleNode*>* rules, char* cons)
+void FuzzyRule::Add(list<RuleNode*>* rules, FuzzySet* cons)
 {
     Rule* rule = new Rule();
 

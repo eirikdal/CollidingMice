@@ -42,6 +42,8 @@ public:
     {
     }
 
+    FuzzySet* Find(char*);
+
 private:
     LINGTYPE m_eType;
     char* m_szName;
@@ -51,6 +53,19 @@ public:
     char* Name() { return m_szName; }
 };
 
+template<class T>
+FuzzySet* FuzzyLing<T>::Find(char* c)
+{
+    for (list<FuzzySet>::iterator lv = m_pLing.begin(); lv != m_pLing.end(); lv++)
+    {
+        FuzzySet cur = *lv;
+
+        if (strcmp(cur.name, c) == 0)
+            return &cur;
+    }
+
+    return NULL;
+}
 
 template <class T>
 FuzzyLing<T>::FuzzyLing(LingVar v, LINGTYPE type)
@@ -129,6 +144,8 @@ FuzzySet* FuzzyLing<T>::Fuzzify(T d)
 
         /* update the grade of membership */
         cur.set->Update(temp);
+        cur.f = temp;
+        memcpy(&(*lv), &cur, sizeof(FuzzySet));
     }
 
     return found;

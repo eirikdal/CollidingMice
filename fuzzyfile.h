@@ -31,9 +31,6 @@ private:
     list< FuzzyLing<int>* > m_pFuzzyLings;
     FuzzyData* m_pFuzzyData;
 
-    LingVar* FindLV(char*, list<LingVar>);
-    FuzzySet* FindMF(char*, list<FuzzySet>);
-
     void c_if(char*, list<LingVar>, FuzzyRule*);
     void c_fuzzy(char*, list<LingVar>);
 

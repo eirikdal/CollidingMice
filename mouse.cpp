@@ -143,8 +143,16 @@ QPainterPath Mouse::shape() const
 //! [3]
 void Mouse::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
-    // Body
-    painter->setBrush(color);
+    int rating = this->getRating();
+
+    if (rating > 75)
+        painter->setBrush(Qt::black);
+    else if (rating < 75 && rating > 25)
+        painter->setBrush(Qt::blue);
+    else
+        painter->setBrush(Qt::green);
+
+    //painter->setBrush(color);
     painter->drawEllipse(-10, -20, 20, 40);
 
     // Eyes
@@ -173,16 +181,12 @@ void Mouse::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *
     painter->setBrush(Qt::NoBrush);
     painter->drawPath(path);
 }
-//! [3]
 
-//! [4]
 void Mouse::advance(int step)
 {
     if (!step)
         return;
-//! [4]
     // Don't move too far away
-//! [5]
     QLineF lineToCenter(QPointF(0, 0), mapFromScene(0, 0));
     if (lineToCenter.length() > 150) {
         qreal angleToCenter = ::acos(lineToCenter.dx() / lineToCenter.length());
@@ -201,12 +205,9 @@ void Mouse::advance(int step)
         angle += 0.25;
     } else if (::sin(angle) > 0) {
         angle -= 0.25;
-//! [5] //! [6]
     }
-//! [6]
 
     // Try not to crash with any other mice
-//! [7]
     QList<QGraphicsItem *> dangerMice = scene()->items(QPolygonF()
                                                        << mapToScene(0, 0)
                                                        << mapToScene(-30, -50)
@@ -240,32 +241,9 @@ void Mouse::advance(int step)
         } else if (angleToMouse <= TwoPi && angleToMouse > (TwoPi - Pi / 2)) {
             // Rotate left
             angle -= 0.5;
-//! [7] //! [8]
-        }
-//! [8] //! [9]
-    }
-//! [9]
-
-
-//! [10]
-
-
-//! [10]
-    if (dangerMice.size() > 1)
-    {
-        switch (fuzzy->action(this->getHealth(), nearestMouse->getRating(), min))
-        {
-        case Fuzzy::ATTACK:
-            break;
-        case Fuzzy::FLEE:
-            break;
-        case Fuzzy::RUN:
-            break;
-        case Fuzzy::NONE:
-            // Add some random movement
-            break;
         }
     }
+
 
     if (dangerMice.size() > 1 && (qrand() % 10) == 0) {
         if (qrand() % 1)
@@ -274,15 +252,29 @@ void Mouse::advance(int step)
             angle -= (qrand() % 100) / 500.0;
 
         }
-    speed += (-50 + qrand() % 100) / 100.0;
 
-    qreal dx = ::sin(angle) * 10;
-    mouseEyeDirection = (qAbs(dx / 5) < 1) ? 0 : dx / 5;
+    foreach (QGraphicsItem *item, scene()->collidingItems(this))
+    {
+        Mouse* otherMouse = (Mouse*) item;
 
-    setRotation(rotation() + dx);
+        otherMouse->setHealth(otherMouse->getHealth() - (qrand()%5));
+
+        if (otherMouse->getHealth() <= 0)
+            otherMouse->removeFromIndex();
+
+    }
+
+    if (dangerMice.size() > 1)
+        speed = fuzzy->action(this->getHealth(), nearestMouse->getRating(), min);
+    else
+    {
+        speed += (-50 + qrand() % 100) / 100.0;
+
+        qreal dx = ::sin(angle) * 10;
+        mouseEyeDirection = (qAbs(dx / 5) < 1) ? 0 : dx / 5;
+
+        setRotation(rotation() + dx);
+    }
+
     setPos(mapToParent(0, -(3 + sin(speed) * 3)));
-//! [11]
-
 }
-
-//! [11]

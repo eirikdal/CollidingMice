@@ -3,8 +3,8 @@ define lingvar rating wimp moderate hard
 define lingvar action donothing attack flee
 define lingvar range close medium far distant
 
-define fuzzyset uninjured grade=100,1|95,0
-define fuzzyset minor triangle=100,0|90,1|80,0
+define fuzzyset uninjured grade=95,1|100,0
+define fuzzyset minor triangle=80,0|90,1|100,0
 define fuzzyset serious triangle=50,0|75,1|100,0
 define fuzzyset critical trapezoid=10,0|25,1|35,1|50,0
 define fuzzyset neardeath reverse=0,0|10,1
@@ -14,9 +14,9 @@ define fuzzyset medium triangle=20,0|50,1|75,0
 define fuzzyset far trapezoid=25,0|50,1|75,1|100,0
 define fuzzyset distant grade=75,0|100,1
 
-define fuzzyset donothing reverse=0,0|5,1
-define fuzzyset attack triangle=5,0|10,1|15,0
-define fuzzyset flee grade=15,1|20,0
+define fuzzyset flee trapezoid=0,0|5,1|10,1|15,0
+define fuzzyset donothing triangle=10,0|15,1|20,0
+define fuzzyset attack trapezoid=15,0|20,1|25,1|20,0
 
 define fuzzyset wimp reverse=0,1|50,0
 define fuzzyset moderate triangle=25,0|50,1|75,0
@@ -26,8 +26,8 @@ define ruleformat mamdani
 if health is not uninjured AND rating is wimp then action is donothing
 if health is not uninjured AND rating is moderate then action is flee
 if health is not uninjured AND rating is hard then action is flee
-if health is neardeath then action is flee
-if rating is wimp then action is attack
-if rating is hard AND health is not uninjured then action is flee
+if health is neardeath OR health is critical then action is flee
 if rating is moderate AND health is uninjured then action is attack
-if health is uninjured OR range is close then action is attack
+if rating is wimp then action is attack
+if rating is not hard AND health is uninjured then action is attack
+if rating is not hard AND health is not uninjured then action is donothing
