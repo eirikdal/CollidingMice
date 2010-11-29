@@ -9,7 +9,7 @@
 enum MTYPE { GRADE, TRAPEZOID, REVERSE, TRIANGLE, UNKNOWN };
 enum HEDGE { SLIGHTLY, LITTLE, VERY, EXTREMELY, NORMAL };
 
-/* Linguistic variable */
+/* Class for holding the Membership-function */
 template <class T>
 class FuzzyItem
 {
@@ -24,7 +24,6 @@ public:
 
     MTYPE Type() { return m_eType; }
 
-    /* update degree of membership and hedges */
     void Update(float f) {
         m_fGrade = f;
     }
@@ -79,7 +78,8 @@ public:
 };
 
 
-/* Instantiate new FuzzyItem with descriptor, number of arguments, etc .. */
+/* Constructor for base-class. Accepts description of the MF,
+   type of MF and a variable number of points */
 template <class T>
 FuzzyItem<T>::FuzzyItem (char* desc, MTYPE eType, T n, ...)
 {
@@ -111,6 +111,7 @@ FuzzyItem<T>::FuzzyItem (char* desc, MTYPE eType, T n, ...)
     va_end(ap);
 }
 
+/* Find degree of Membership for a grade MF */
 template <class T>
 float FuzzyGrade<T>::Member(T d)
 {
@@ -131,11 +132,11 @@ float FuzzyGrade<T>::Member(T d)
     return f;
 }
 
+/* Find degree of Membership for a trapezoidal MF */
 template <class T>
 float FuzzyTrap<T>::Member(T d)
 {
     float f = .0;
-    //float x0 = this->m_iParams[0], x1 = this->m_iParams[1], x2 = this->m_iParams[2], x3 = this->m_iParams[3];
     float x0 = 0, x1 = this->m_iParams[1] - this->m_iParams[0], x2 = this->m_iParams[2] - this->m_iParams[0], x3 = this->m_iParams[3] - this->m_iParams[0];
     d -= this->m_iParams[0];
 
@@ -155,6 +156,7 @@ float FuzzyTrap<T>::Member(T d)
     return f;
 }
 
+/* Find degree of Membership for a reverse-grade MF */
 template <class T>
 float FuzzyRev<T>::Member(T d)
 {
@@ -175,6 +177,7 @@ float FuzzyRev<T>::Member(T d)
     return f;
 }
 
+/* Find degree of Membership for a triangular MF */
 template <class T>
 float FuzzyTri<T>::Member(T d)
 {

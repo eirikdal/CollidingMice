@@ -143,16 +143,7 @@ QPainterPath Mouse::shape() const
 //! [3]
 void Mouse::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
-    int rating = this->getRating();
-
-    if (rating > 75)
-        painter->setBrush(Qt::black);
-    else if (rating < 75 && rating > 25)
-        painter->setBrush(Qt::blue);
-    else
-        painter->setBrush(Qt::green);
-
-    //painter->setBrush(color);
+    painter->setBrush(color);
     painter->drawEllipse(-10, -20, 20, 40);
 
     // Eyes
@@ -265,9 +256,35 @@ void Mouse::advance(int step)
     }
 
     if (dangerMice.size() > 1)
+    {
         speed = fuzzy->action(this->getHealth(), nearestMouse->getRating(), min);
+
+        if (speed >= 10)
+        {
+            color = Qt::red;
+        }
+        else if (speed < 0)
+        {
+            color = Qt::yellow;
+
+            qreal dx = ::sin(angle) * 10;
+            mouseEyeDirection = (qAbs(dx / 5) < 1) ? 0 : dx / 5;
+
+            setRotation(rotation() + dx);
+        }
+        else
+        {
+            color = Qt::gray;
+
+            qreal dx = ::sin(angle) * 10;
+            mouseEyeDirection = (qAbs(dx / 5) < 1) ? 0 : dx / 5;
+
+            setRotation(rotation() + dx);
+        }
+    }
     else
     {
+        /* No mice nearby, default to standard behaviour */
         speed += (-50 + qrand() % 100) / 100.0;
 
         qreal dx = ::sin(angle) * 10;

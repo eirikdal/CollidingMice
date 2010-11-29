@@ -10,15 +10,9 @@ public:
     Fuzzy ();
     ~Fuzzy();
 
-    /*
-    struct FuzzySet
-    {
-        FuzzyLing<int>::FuzzyLing* ths;
-        FuzzySet* nxt;
-    };
-*/
     int action(int, int, int);
 
+    /* Helper functions. Mainly list-traversal. */
     static LingVar* FindLV(char*, list<LingVar>);
     static FuzzySet* FindMF(char*, list<FuzzySet>);
     static FuzzySet* FindMF(char*, list<LingVar>);

@@ -1,11 +1,7 @@
 #include "fuzzyrule.h"
 #include <list>
 
-FuzzyRule::FuzzyRule()
-{
-    //root = NULL;
-}
-
+/* Adjust for hedges if necessary */
 float FuzzyRule::Hedgify(float f, HEDGE h)
 {
     switch (h)
@@ -27,6 +23,7 @@ float FuzzyRule::Hedgify(float f, HEDGE h)
     return f;
 }
 
+/* Step 2: Rule evaluation */
 list<FuzzySet*> FuzzyRule::Eval(list<FuzzySet*> ling)
 {
     /* temp variables for control flow */
@@ -39,8 +36,6 @@ list<FuzzySet*> FuzzyRule::Eval(list<FuzzySet*> ling)
 
     list<FuzzySet*>* c_list = new list<FuzzySet*>();
     list<Rule*> r_list = m_pRules;
-
-    /* TODO: we need to do AND(min), OR(max) "analysis here too" */
 
     for (list<Rule*>::iterator pr = r_list.begin(); pr != r_list.end(); pr++)
     {

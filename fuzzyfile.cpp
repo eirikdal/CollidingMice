@@ -38,7 +38,8 @@ void FuzzyFile::c_fuzzy(char* tok, list<LingVar> lingVars)
 
             if (strcmp(key, s.name) == 0)
             {
-                /* we found the right fuzzyset, now update it */
+                /* Parse membership functions, updating
+                   the linguistic variables as we find them */
                 while (tok != NULL)
                 {
                     char* name = strtok(tok, "=");
@@ -161,6 +162,7 @@ void FuzzyFile::c_fuzzy(char* tok, list<LingVar> lingVars)
     }
 }
 
+/* Helper function for rule parsing. */
 HEDGE FuzzyFile::c_hedge(char* tok)
 {
     HEDGE hedge;
@@ -179,6 +181,7 @@ HEDGE FuzzyFile::c_hedge(char* tok)
     return hedge;
 }
 
+/* Rule parsing */
 void FuzzyFile::c_if(char* tok, list<LingVar> lingVars, FuzzyRule* rules)
 {
     list<RuleNode*>* ruleList = new list<RuleNode*>();
@@ -283,6 +286,7 @@ void FuzzyFile::c_if(char* tok, list<LingVar> lingVars, FuzzyRule* rules)
     }
 }
 
+/* Load the dataset from file */
 bool FuzzyFile::Load()
 {
     bool b = false;
@@ -344,7 +348,12 @@ bool FuzzyFile::Load()
                 }
                 else if (strcmp(tok, "ruleformat") == 0)
                 {
-                    rules = new FuzzyRule();
+                    tok = strtok(NULL, " ");
+
+                    if (strcmp(tok, "mamdani") == 0)
+                        rules = new FuzzyRule(MAMDANI);
+                    else if (strcmp(tok, "sugeno") == 0)
+                        rules = new FuzzyRule(SUGENO);
                 }
                 else if (strcmp(tok, "if") == 0)
                 {

@@ -10,8 +10,6 @@ SOURCES += \
 	main.cpp \
         mouse.cpp \
     fuzzy.cpp \
-    fuzzyitem.cpp \
-    fuzzyling.cpp \
     fuzzyfile.cpp \
     fuzzyrule.cpp \
     fuzzyset.cpp

@@ -1,7 +1,7 @@
 define lingvar health neardeath critical serious minor uninjured
 define lingvar rating wimp moderate hard
 define lingvar action donothing attack flee
-define lingvar range close medium far distant
+define lingvar range close far distant
 
 define fuzzyset neardeath reverse=0,1|20,0
 define fuzzyset critical trapezoid=0,0|15,1|30,1|45,0
@@ -9,26 +9,19 @@ define fuzzyset serious triangle=40,0|50,1|60,0
 define fuzzyset minor trapezoid=50,0|65,1|80,1|95,0
 define fuzzyset uninjured grade=90,1|100,0
 
-define fuzzyset close reverse=0,1|25,0
-define fuzzyset medium triangle=20,0|50,1|75,0
-define fuzzyset far trapezoid=25,0|50,1|75,1|100,0
-define fuzzyset distant grade=75,0|100,1
+define fuzzyset close reverse=0,1|50,0
+define fuzzyset far trapezoid=40,0|50,1|60,1|70,0
+define fuzzyset distant grade=60,0|100,1
 
 define fuzzyset flee trapezoid=0,0|5,1|10,1|15,0
 define fuzzyset donothing triangle=10,0|15,1|20,0
-define fuzzyset attack trapezoid=15,0|20,1|25,1|20,0
+define fuzzyset attack trapezoid=15,0|20,1|25,1|30,0
 
 define fuzzyset wimp reverse=0,1|50,0
 define fuzzyset moderate triangle=25,0|50,1|75,0
 define fuzzyset hard grade=50,0|100,1
 
-define ruleformat mamdani
-if health is not uninjured AND rating is wimp then action is donothing
-if health is not uninjured AND rating is moderate then action is flee
-if health is not uninjured AND rating is hard then action is flee
-if health is neardeath OR health is critical then action is flee
-if rating is moderate AND health is uninjured then action is attack
-if rating is wimp then action is attack
-if rating is not hard AND health is uninjured then action is attack
-if rating is not hard AND health is not uninjured then action is donothing
-if rating is very wimp then action is attack
+define ruleformat sugeno
+if health is uninjured AND rating is not hard AND range is close then action is attack
+if range is not close AND health is uninjured then action is donothing
+if health is neardeath OR health is critical AND range is close then action is flee

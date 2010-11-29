@@ -11,7 +11,9 @@ enum PREFIX { NEG, POS };
 
 struct RuleNode
 {
+    // precedent
     char* pre;
+    // antecedant
     char* ant;
 
     HEDGE hedge;
@@ -27,15 +29,23 @@ struct Rule
     FuzzySet* cons;
 };
 
+enum FORMAT
+{
+    SUGENO,
+    MAMDANI
+};
+
 class FuzzyRule
 {
 public:
-    FuzzyRule();
+    FuzzyRule(FORMAT format) { m_eFormat = format; }
 
     void Add(list<RuleNode*>*, FuzzySet*);
     list<FuzzySet*> Eval(list<FuzzySet*>);
 
+    FORMAT Format() { return m_eFormat; }
 private:
+    FORMAT m_eFormat;
     list<Rule*> m_pRules;
     float Hedgify(float, HEDGE);
 };
