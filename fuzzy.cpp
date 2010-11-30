@@ -28,6 +28,7 @@ Fuzzy::Fuzzy()
 
 Fuzzy::~Fuzzy()
 {
+    free(m_pFile);
     /*
     for (list< LingVar >::iterator lv = m_pLings.begin(); lv != m_pLings.end(); lv++)
     {
@@ -195,7 +196,7 @@ int Fuzzy::action(int health, int rating, int range)
 
 
     float cog = .0;
-    /* Step 4: Defuzzification, using either Sugeno or Mamdani to get crisp value. */
+    /* Step 4: Defuzzification, using either Sugeno or Mamdani. */
     if (m_pRules->Format() == MAMDANI)
     {
         float cog1 = .0, cog2 = .0;
@@ -212,25 +213,6 @@ int Fuzzy::action(int health, int rating, int range)
     }
     else if (m_pRules->Format() == SUGENO)
         cog = (-10 * m_fVal[7] + m_fVal[15] + m_fVal[22] * 10) / (m_fVal[7] + m_fVal[15] + m_fVal[22]);
-
-    /* Step 4: Defuzzification, find out which action the crisp value most belongs to. */
-    for (list< FuzzyLing<int>* >::iterator lv = m_pLings.begin(); lv != m_pLings.end(); lv++)
-    {
-        FuzzyLing<int>* v = *lv;
-
-        FuzzySet* f = new FuzzySet();
-
-        /* Fuzzify the linguistic variables health, rating and range */
-        if (v->getType() == OUTPUT)
-        {
-
-        }
-
-        /* Add the fuzzified variables to a temporary list */
-        *lv = v;
-        f->type = v->Name();
-        vars.push_back(f);
-    }
 
     // if cog is a number, return it, otherwise return 1 (donothing)
     return (cog != cog) ? 1 : cog;

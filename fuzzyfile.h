@@ -26,7 +26,6 @@ public:
     bool Load();
 private:
     ifstream m_pRead;
-    ofstream m_pWrite;
 
     list< FuzzyLing<int>* > m_pFuzzyLings;
     FuzzyData* m_pFuzzyData;

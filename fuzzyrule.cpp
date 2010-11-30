@@ -37,14 +37,17 @@ list<FuzzySet*> FuzzyRule::Eval(list<FuzzySet*> ling)
     list<FuzzySet*>* c_list = new list<FuzzySet*>();
     list<Rule*> r_list = m_pRules;
 
+    /* For each rule */
     for (list<Rule*>::iterator pr = r_list.begin(); pr != r_list.end(); pr++)
     {
         Rule* r = *pr;
 
+        /* We need to evaluate each part of the rule seperately */
         for (list<RuleNode*>::iterator pn = r->rules->begin(); pn != r->rules->end(); pn++)
         {
             RuleNode* n = *pn;
 
+            /* Check to see if the statement is true */
             for (list<FuzzySet*>::iterator ps = ling.begin(); ps != ling.end(); ps++)
             {
                 FuzzySet* s = *ps;
@@ -68,13 +71,21 @@ list<FuzzySet*> FuzzyRule::Eval(list<FuzzySet*> ling)
                     bAnd = false;
                 }
 
+                /* if true */
                 if (strcmp(s->name, n->ant) == 0 && n->sign == POS)
                 {
+                    /* Check to see if the AND-operator or OR-operator are specified. If so,
+                        we need to handle them properly. b is the value of the previous statement. */
                     if (!b && bAnd)
                         b = false;
                     else if(b && bAnd)
                     {
                         fVal = min(fVal, this->Hedgify(s->f, n->hedge));
+                        b = true;
+                    }
+                    else if (b && bOr)
+                    {
+                        fVal = max(fVal, this->Hedgify(s->f, n->hedge));
                         b = true;
                     }
                     else
@@ -85,11 +96,17 @@ list<FuzzySet*> FuzzyRule::Eval(list<FuzzySet*> ling)
                 }
                 else if (strcmp(s->name, n->ant) != 0 && n->sign == NEG)
                 {
+                    /* Same procedure as above, only this time for negated statements. */
                     if (!b && bAnd)
                         b = false;
                     else if(b && bAnd)
                     {
                         fVal = min(fVal, this->Hedgify(s->f, n->hedge));
+                        b = true;
+                    }
+                    else if (b && bOr)
+                    {
+                        fVal = max(fVal, this->Hedgify(s->f, n->hedge));
                         b = true;
                     }
                     else
@@ -98,11 +115,10 @@ list<FuzzySet*> FuzzyRule::Eval(list<FuzzySet*> ling)
                         b = true;
                     }
                 }
+                /* if the OR-operator is specified and the last statement was true, but this wasn't
+                    we need to preserve the information for the future */
                 else if (bOr && b)
-                {
-                    fVal = max(fVal, this->Hedgify(s->f, n->hedge));
                     b = true;
-                }
                 else
                     b = false;
             }
@@ -120,6 +136,7 @@ list<FuzzySet*> FuzzyRule::Eval(list<FuzzySet*> ling)
     return *c_list;
 }
 
+/* Add a new rule to the list */
 void FuzzyRule::Add(list<RuleNode*>* rules, FuzzySet* cons)
 {
     Rule* rule = new Rule();

@@ -38,10 +38,9 @@ public:
     FuzzyLing(LingVar, LINGTYPE);
 
     FuzzySet* Fuzzify(T d);
-    FuzzySet* Defuzzify(int d);
 
     /* What type of linguistic variable; input, output? */
-    void setType(LINGTYPE type) { m_eType = type; }
+    //void setType(LINGTYPE type) { m_eType = type; }
 
     LINGTYPE getType() { return m_eType; }
 
@@ -115,60 +114,6 @@ FuzzySet* FuzzyLing<T>::Fuzzify(T d)
             break;
         case TRAPEZOID:
             temp = ((FuzzyTrap<T>*) cur.set)->Member(d);
-            break;
-        case UNKNOWN:
-            throw;
-            break;
-        }
-
-        if (temp >= max)
-        {
-            max = temp;
-            memcpy(found, &(*lv), sizeof(FuzzySet));
-            found->f = max;
-        }
-
-        /* update the grade of membership */
-        cur.set->Update(temp);
-        cur.f = temp;
-        memcpy(&(*lv), &cur, sizeof(FuzzySet));
-    }
-
-    return found;
-}
-
-template <class T>
-FuzzySet* FuzzyLing<T>::Defuzzify(T d)
-{
-    FuzzySet* found = new FuzzySet();
-
-    /*
-     * For each of the membership functions,
-     * find out which is closest of each of
-     * the lingvars in the list
-     */
-    float max = .0;
-    float temp = .0;
-
-    /* For each of the membership-functions belonging to this variable,
-       calculate its degree of membership. Return the MF that maximizes that degree. */
-    for (list<FuzzySet>::iterator lv = m_pLing.begin(); lv != m_pLing.end(); lv++)
-    {
-        FuzzySet cur = *lv;
-
-        switch (cur.set->Type())
-        {
-        case GRADE:
-            temp = ((FuzzyGrade<T>*) cur.set)->fromMember(d);
-            break;
-        case REVERSE:
-            temp = ((FuzzyRev<T>*) cur.set)->fromMember(d);
-            break;
-        case TRIANGLE:
-            temp = ((FuzzyTri<T>*) cur.set)->fromMember(d);
-            break;
-        case TRAPEZOID:
-            temp = ((FuzzyTrap<T>*) cur.set)->fromMember(d);
             break;
         case UNKNOWN:
             throw;

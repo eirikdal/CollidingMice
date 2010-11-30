@@ -248,50 +248,75 @@ void Mouse::advance(int step)
     {
         Mouse* otherMouse = (Mouse*) item;
 
-        otherMouse->setHealth(-(qrand()%5));
+        /* We can only hurt the other mouse, if we are in attack mode */
+        if (this->color == Qt::red)
+        {
+            otherMouse->setHealth(-(qrand()%5));
 
-        if (otherMouse->getHealth() <= 0)
-            otherMouse->removeFromIndex();
+            if (otherMouse->getHealth() <= 0)
+            {
+                /* The Mouse died. Remove it from game */
+                otherMouse->removeFromIndex();
+                scene()->removeItem(otherMouse);
+                free(otherMouse);
+            }
+        }
 
     }
+
+    int rating = this->getRating();
+
+    int h = ((float)this->getHealth()/100)*255;
+    int r = ((float)this->getHealth()/100)*64;
+    int b = ((float)this->getHealth()/100)*64;
+    int g = 255-h;
 
     if (dangerMice.size() > 1)
     {
         speed = fuzzy->action(this->getHealth(), nearestMouse->getRating(), min);
 
-        if (speed >= 10)
+        if (speed > 1)
         {
             color = Qt::red;
+            setRotation(rotation());
         }
         else if (speed < 0)
         {
+            // flee
             color = Qt::yellow;
-
-            qreal dx = ::sin(angle) * 10;
-            mouseEyeDirection = (qAbs(dx / 5) < 1) ? 0 : dx / 5;
-
-            setRotation(rotation() + dx);
+            setRotation(-rotation());
         }
         else
         {
-            color = Qt::gray;
-
-            qreal dx = ::sin(angle) * 10;
-            mouseEyeDirection = (qAbs(dx / 5) < 1) ? 0 : dx / 5;
-
-            setRotation(rotation() + dx);
+            // donothing
+            if (rating <= 25)
+                color = QColor(0, g, b);
+            else if (rating > 25 && rating <= 75)
+                color = QColor(r, g, b);
+            else if (rating > 75)
+                color = QColor(0, g, 0);
         }
     }
     else
     {
+        // donothing
+        if (rating <= 25)
+            color = QColor(0, g, b);
+        else if (rating > 25 && rating <= 75)
+            color = QColor(r, g, b);
+        else if (rating > 75)
+            color = QColor(0, g, 0);
+
         /* No mice nearby, default to standard behaviour */
-        speed += (-50 + qrand() % 100) / 100.0;
+        // speed += (-50 + qrand() % 100) / 100.0;
 
         qreal dx = ::sin(angle) * 10;
         mouseEyeDirection = (qAbs(dx / 5) < 1) ? 0 : dx / 5;
 
         setRotation(rotation() + dx);
     }
+
+    speed /= 10;
 
     setPos(mapToParent(0, -(3 + sin(speed) * 3)));
 }

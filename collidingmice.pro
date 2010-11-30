@@ -4,15 +4,13 @@ HEADERS += \
     fuzzyitem.h \
     fuzzyling.h \
     fuzzyfile.h \
-    fuzzyrule.h \
-    fuzzyset.h
+    fuzzyrule.h
 SOURCES += \
 	main.cpp \
         mouse.cpp \
     fuzzy.cpp \
     fuzzyfile.cpp \
-    fuzzyrule.cpp \
-    fuzzyset.cpp
+    fuzzyrule.cpp
 
 RESOURCES += \
 	mice.qrc

@@ -22,6 +22,8 @@ define fuzzyset moderate triangle=25,0|50,1|75,0
 define fuzzyset hard grade=50,0|100,1
 
 define ruleformat sugeno
-if health is uninjured AND rating is not hard AND range is close then action is attack
-if range is not close AND health is uninjured then action is donothing
-if health is neardeath OR health is critical AND range is close then action is flee
+if range is distant then action is donothing
+if health is uninjured AND rating is not hard then action is attack
+if rating is hard AND health is not uninjured then action is flee
+if health is neardeath OR health is critical then action is flee
+if health is not neardeath AND health is not critical AND rating is not hard then action is attack

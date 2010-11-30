@@ -12,13 +12,11 @@ using namespace std;
 FuzzyFile::FuzzyFile()
 {
     m_pRead.open(SDATA);
-    //m_pWrite.open(szFile);
 }
 
 FuzzyFile::~FuzzyFile()
 {
     m_pRead.close();
-    //m_pWrite.close();
 }
 
 void FuzzyFile::c_fuzzy(char* tok, list<LingVar> lingVars)

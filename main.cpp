@@ -44,7 +44,7 @@
 
 #include <math.h>
 
-static const int MouseCount = 7;
+static const int MouseCount = 4;
 
 //! [0]
 int main(int argc, char **argv)
