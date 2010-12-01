@@ -29,21 +29,13 @@ Fuzzy::Fuzzy()
 Fuzzy::~Fuzzy()
 {
     free(m_pFile);
-    /*
-    for (list< LingVar >::iterator lv = m_pLings.begin(); lv != m_pLings.end(); lv++)
+
+    for (list< FuzzyLing<int>* >::iterator lv = m_pLings.begin(); lv != m_pLings.end(); lv++)
     {
-        LingVar v = *lv;
-
-        for (list<FuzzySet>::iterator it = v.items.begin(); it != v.items.end(); it++)
-        {
-            FuzzySet s = *it;
-
-            free (s.set);
-            free (s);
-        }
+        FuzzyLing<int>* v = *lv;
 
         free(v);
-    }*/
+    }
 }
 
 /* Helper-function for finding a linguistic variable by name */

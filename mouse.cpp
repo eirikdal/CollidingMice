@@ -177,6 +177,15 @@ void Mouse::advance(int step)
 {
     if (!step)
         return;
+
+    if (this->getHealth() <= 0)
+    {
+        /* The Mouse died. Remove it from game */
+        this->removeFromIndex();
+        scene()->removeItem(this);
+        return;
+    }
+
     // Don't move too far away
     QLineF lineToCenter(QPointF(0, 0), mapFromScene(0, 0));
     if (lineToCenter.length() > 150) {
@@ -250,41 +259,37 @@ void Mouse::advance(int step)
 
         /* We can only hurt the other mouse, if we are in attack mode */
         if (this->color == Qt::red)
-        {
             otherMouse->setHealth(-(qrand()%5));
-
-            if (otherMouse->getHealth() <= 0)
-            {
-                /* The Mouse died. Remove it from game */
-                otherMouse->removeFromIndex();
-                scene()->removeItem(otherMouse);
-                free(otherMouse);
-            }
-        }
-
     }
 
     int rating = this->getRating();
 
     int h = ((float)this->getHealth()/100)*255;
-    int r = ((float)this->getHealth()/100)*64;
-    int b = ((float)this->getHealth()/100)*64;
+    int r = ((float)this->getHealth()/100)*96;
+    int b = ((float)this->getHealth()/100)*128;
     int g = 255-h;
 
     if (dangerMice.size() > 1)
     {
         speed = fuzzy->action(this->getHealth(), nearestMouse->getRating(), min);
 
+        QLineF lineToMouse(QPointF(0, 0), mapFromItem(nearestMouse, 0, 0));
+
+        qreal angleToMouse = ::acos(lineToMouse.dx() / lineToMouse.length());
+        if (lineToMouse.dy() < 0)
+            angleToMouse = TwoPi - angleToMouse;
+        angleToMouse = normalizeAngle((Pi - angleToMouse) + Pi / 2);
+
         if (speed > 1)
         {
-            color = Qt::red;
             setRotation(rotation());
+            color = Qt::red;
         }
         else if (speed < 0)
         {
             // flee
-            color = Qt::yellow;
             setRotation(-rotation());
+            color = Qt::yellow;
         }
         else
         {
@@ -295,6 +300,11 @@ void Mouse::advance(int step)
                 color = QColor(r, g, b);
             else if (rating > 75)
                 color = QColor(0, g, 0);
+
+            qreal dx = ::sin(angle) * 10;
+            mouseEyeDirection = (qAbs(dx / 5) < 1) ? 0 : dx / 5;
+
+            setRotation(rotation() + dx);
         }
     }
     else
